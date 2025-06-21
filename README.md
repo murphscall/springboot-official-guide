@@ -1,4 +1,6 @@
 
+
+
 ## SpringApplication 핵심 기능
 
 <details>
@@ -260,6 +262,146 @@ public class MyApp {
         SpringApplication.run(MyApp.class, args);
     }
 }
+```
+
+</details>
+
+
+
+
+
+
+
+## SpringBoot 구조 / Flowchart
+<details>
+<summary>스프링 부트 핵심 구조</summary>
+
+```mermaid
+flowchart TD
+    subgraph "Spring_Boot_Application"
+        MainClass[SpringBootApplication Main Class]
+
+        subgraph "Auto_Configuration"
+            EnableAutoConfig[EnableAutoConfiguration]
+            ConditionalOnClass[ConditionalOnClass]
+            ConditionalOnBean[ConditionalOnBean]
+            AutoConfigClasses[Auto Configuration Classes]
+        end
+        
+        subgraph "Starter_Dependencies"
+            WebStarter[spring-boot-starter-web]
+            DataJPAStarter[spring-boot-starter-data-jpa]
+            SecurityStarter[spring-boot-starter-security]
+            TestStarter[spring-boot-starter-test]
+        end
+        
+        subgraph "Configuration_Properties"
+            ApplicationProperties[application.properties]
+            ApplicationYAML[application.yml]
+            ProfileSpecific[application-dev.yml]
+            ConfigProperties[ConfigurationProperties Classes]
+        end
+    end
+    
+    MainClass --> EnableAutoConfig
+    EnableAutoConfig --> ConditionalOnClass
+    ConditionalOnClass --> ConditionalOnBean
+    ConditionalOnBean --> AutoConfigClasses
+    
+    WebStarter --> AutoConfigClasses
+    DataJPAStarter --> AutoConfigClasses
+    SecurityStarter --> AutoConfigClasses
+    
+    ApplicationProperties --> ConfigProperties
+    ApplicationYAML --> ConfigProperties
+    ProfileSpecific --> ConfigProperties
+```
+</details>
+
+<details>
+<summary>처리 흐름</summary>
+
+```mermaid
+flowchart TD
+    Start[HTTP Request] 
+    Start --> Security{Security Check}
+    Security -->|Pass| Controller[Controller]
+    Security -->|Fail| Error[401 Error]
+    
+    Controller --> Validation{Validation}
+    Validation -->|Valid| Service[Service]
+    Validation -->|Invalid| BadRequest[400 Error]
+    
+    Service --> Business[Business Logic]
+    Business --> Repository[Repository]
+    Repository --> Database[(Database)]
+    
+    Database --> EntityReturn[Entity]
+    EntityReturn --> DTOMapping[DTO Mapping]
+    DTOMapping --> Response[Response]
+    
+    Error --> End[End]
+    BadRequest --> End
+    Response --> End
+```
+</details>
+
+<details>
+<summary>Web MVC 요청 처리</summary>
+
+```mermaid
+flowchart TD
+    HTTPRequest[HTTP Request] --> DispatcherServlet[DispatcherServlet]
+    DispatcherServlet --> HandlerMapping[HandlerMapping]
+    HandlerMapping --> HandlerAdapter[HandlerAdapter]
+    HandlerAdapter --> ControllerMethod[Controller Method]
+    
+    ControllerMethod --> ModelAndView[ModelAndView or ResponseEntity]
+    ModelAndView --> ViewResolver[ViewResolver]
+    ViewResolver --> View[View Rendering]
+    View --> HTTPResponse[HTTP Response]
+    
+    subgraph "Handler_Annotations"
+        GetMapping[GetMapping]
+        PostMapping[PostMapping]
+        RequestBody[RequestBody]
+        ResponseBody[ResponseBody]
+        PathVariable[PathVariable]
+        RequestParam[RequestParam]
+    end
+    
+    ControllerMethod --> GetMapping
+    ControllerMethod --> PostMapping
+    ControllerMethod --> RequestBody
+    ControllerMethod --> ResponseBody
+```
+
+</details>
+
+
+<details>
+<summary>redis 캐시 흐름</summary>
+
+```mermaid
+flowchart TD
+  Start[메소드 호출<br/>@Cacheable] --> CacheCheck{캐시에 데이터<br/>존재?}
+
+CacheCheck -->|Cache Hit| RedisGet[Redis에서 데이터 조회]
+RedisGet --> Deserialize[JSON → Java Object<br/>역직렬화]
+Deserialize --> ReturnCached[캐시된 객체 반환]
+
+CacheCheck -->|Cache Miss| ExecuteMethod[실제 메소드 실행]
+ExecuteMethod --> DatabaseQuery[데이터베이스 조회]
+DatabaseQuery --> Serialize[Java Object → JSON<br/>직렬화]
+Serialize --> RedisSave[Redis에 저장]
+RedisSave --> ReturnNew[새로운 객체 반환]
+
+ReturnCached --> End[End]
+ReturnNew --> End
+
+style RedisGet fill:grey
+style RedisSave fill:grey
+style DatabaseQuery fill:grey
 ```
 
 </details>
