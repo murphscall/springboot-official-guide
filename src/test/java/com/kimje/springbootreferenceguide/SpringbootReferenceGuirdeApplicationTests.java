@@ -1,4 +1,4 @@
-package com.kimje.springbootreferenceguirde;
+package com.kimje.springbootreferenceguide;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
